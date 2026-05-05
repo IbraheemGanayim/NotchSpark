@@ -6,8 +6,13 @@
 [![Swift](https://img.shields.io/badge/Swift-5.9%2B-F05138?style=for-the-badge&logo=swift&logoColor=white)](https://swift.org/)
 [![Offline](https://img.shields.io/badge/Offline-Private-2EA44F?style=for-the-badge)](#privacy-first)
 [![MIT](https://img.shields.io/badge/License-MIT-6E40C9?style=for-the-badge)](LICENSE)
+[![Latest Release](https://img.shields.io/github/v/release/IbraheemGanayim/NotchSpark?style=for-the-badge&label=Download&color=0A84FF)](https://github.com/IbraheemGanayim/NotchSpark/releases/latest)
 
 NotchSpark is a native macOS menu-bar app for MacBooks with a notch. Glide your cursor near the notch and a compact animated bubble appears with a short, fun, offline fact. It is minimal, fast, private, and designed to make your Mac feel a little more alive.
+
+<p align="center">
+  <img src="docs/notchspark-preview.svg" alt="NotchSpark preview showing a compact fact bubble below a MacBook notch" width="760">
+</p>
 
 ## 🌟 Why People Love It
 
@@ -20,7 +25,16 @@ NotchSpark is a native macOS menu-bar app for MacBooks with a notch. Glide your 
 
 ## 🚀 Install
 
-### Option 1: Clone And Install
+### Option 1: Download The App
+
+1. Download `NotchSpark.zip` from the [latest release](https://github.com/IbraheemGanayim/NotchSpark/releases/latest).
+2. Unzip it.
+3. Move `NotchSpark.app` to your `Applications` folder.
+4. Open it and look for the sparkle icon in your menu bar.
+
+If macOS says the app is from an unidentified developer, right-click `NotchSpark.app`, choose **Open**, then confirm. A signed and notarized release is on the roadmap.
+
+### Option 2: Clone And Install
 
 ```sh
 git clone https://github.com/IbraheemGanayim/NotchSpark.git
@@ -30,7 +44,7 @@ Scripts/install_app.sh
 
 That builds NotchSpark, installs it to `~/Applications/NotchSpark.app`, and launches it.
 
-### Option 2: Build And Run Locally
+### Option 3: Build And Run Locally
 
 ```sh
 git clone https://github.com/IbraheemGanayim/NotchSpark.git
@@ -39,7 +53,7 @@ Scripts/build_app.sh
 open .build/NotchSpark.app
 ```
 
-### Option 3: Developer Mode
+### Option 4: Developer Mode
 
 ```sh
 swift run NotchSpark
