@@ -29,7 +29,7 @@ final class FactStoreTests: XCTestCase {
     }
 
     func testDefaultFactsAreShortAndRenderable() {
-        XCTAssertGreaterThan(FunFact.defaultFacts.count, 24)
+        XCTAssertGreaterThan(FunFact.defaultFacts.count, 200)
 
         for fact in FunFact.defaultFacts {
             XCTAssertFalse(fact.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)

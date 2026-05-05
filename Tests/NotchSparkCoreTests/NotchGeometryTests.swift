@@ -17,7 +17,11 @@ final class NotchGeometryTests: XCTestCase {
         XCTAssertTrue(metrics.hasDetectedNotch)
         XCTAssertEqual(metrics.notchWidth, 204, accuracy: 0.1)
         XCTAssertEqual(metrics.center.x, 1512, accuracy: 0.1)
+        XCTAssertEqual(metrics.triggerZone.width, metrics.notchWidth, accuracy: 0.1)
+        XCTAssertEqual(metrics.triggerZone.height, metrics.notchHeight, accuracy: 0.1)
         XCTAssertTrue(metrics.triggerZone.contains(CGPoint(x: 1512, y: 1928)))
+        XCTAssertFalse(metrics.triggerZone.contains(CGPoint(x: 1512, y: 1885)))
+        XCTAssertFalse(metrics.triggerZone.contains(CGPoint(x: 1620, y: 1928)))
         XCTAssertLessThan(metrics.bubbleAnchor.y, screen.frame.maxY)
     }
 
@@ -31,7 +35,9 @@ final class NotchGeometryTests: XCTestCase {
 
         XCTAssertFalse(metrics.hasDetectedNotch)
         XCTAssertEqual(metrics.center.x, 720, accuracy: 0.1)
-        XCTAssertTrue(metrics.triggerZone.contains(CGPoint(x: 720, y: 860)))
+        XCTAssertTrue(metrics.triggerZone.contains(CGPoint(x: 720, y: 880)))
+        XCTAssertFalse(metrics.triggerZone.contains(CGPoint(x: 720, y: 850)))
+        XCTAssertFalse(metrics.triggerZone.contains(CGPoint(x: 820, y: 880)))
         XCTAssertFalse(metrics.triggerZone.contains(CGPoint(x: 100, y: 860)))
     }
 

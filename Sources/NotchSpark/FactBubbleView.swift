@@ -5,11 +5,44 @@ struct FactBubbleView: View {
     let fact: FunFact
     let contrastStyle: BubbleContrastStyle
 
-    @State private var isVisible = false
+    private let bubbleRadius: CGFloat = 22
+    private let iconSize: CGFloat = 32
+
+    @State private var contentOpacity = 0.0
+    @State private var contentScale: CGFloat = 0.94
+    @State private var contentOffset: CGFloat = 7
     @State private var shimmerOffset: CGFloat = -220
+    @State private var sparkOffset: CGFloat = -40
+    @State private var sparkOpacity = 0.0
+    @State private var notchLipWidth: CGFloat = 108
+    @State private var notchLipOpacity = 0.82
+    @State private var glowPulse = false
     @State private var iconLift: CGFloat = 5
 
     var body: some View {
+        ZStack {
+            bubbleBackground
+
+            content
+                .padding(.horizontal, 14)
+                .padding(.vertical, 10)
+                .opacity(contentOpacity)
+                .scaleEffect(contentScale, anchor: .top)
+                .offset(y: contentOffset)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .clipShape(bubbleShape)
+        .overlay(border)
+        .overlay(shimmer)
+        .overlay(notchLip, alignment: .top)
+        .overlay(sparkGlide)
+        .compositingGroup()
+        .shadow(color: shadowColor, radius: glowPulse ? 24 : 13, y: 10)
+        .shadow(color: Color.black.opacity(contrastStyle == .paper ? 0.18 : 0.34), radius: 16, y: 10)
+        .onAppear(perform: animateIn)
+    }
+
+    private var content: some View {
         HStack(spacing: 11) {
             icon
 
@@ -24,15 +57,6 @@ struct FactBubbleView: View {
 
             Spacer(minLength: 0)
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 10)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(bubbleBackground)
-        .overlay(shimmer)
-        .scaleEffect(isVisible ? 1 : 0.82, anchor: .top)
-        .offset(y: isVisible ? 0 : -10)
-        .opacity(isVisible ? 1 : 0)
-        .onAppear(perform: animateIn)
     }
 
     private var icon: some View {
@@ -50,22 +74,31 @@ struct FactBubbleView: View {
                 .shadow(color: iconShadow, radius: 7, y: 2)
                 .offset(y: iconLift)
         }
-        .frame(width: 32, height: 32)
+        .frame(width: iconSize, height: iconSize)
     }
 
     private var bubbleBackground: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
+            bubbleShape
                 .fill(.regularMaterial)
 
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
+            bubbleShape
                 .fill(surfaceGradient)
-
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .strokeBorder(borderGradient, lineWidth: 1)
         }
-        .shadow(color: shadowColor, radius: 18, y: 10)
-        .shadow(color: Color.black.opacity(contrastStyle == .paper ? 0.18 : 0.34), radius: 16, y: 10)
+    }
+
+    private var bubbleShape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: bubbleRadius, style: .continuous)
+    }
+
+    private var border: some View {
+        bubbleShape
+            .strokeBorder(borderGradient, lineWidth: 1)
+            .overlay(
+                bubbleShape
+                    .inset(by: 1.5)
+                    .strokeBorder(innerBorderColor, lineWidth: 0.6)
+            )
     }
 
     private var shimmer: some View {
@@ -87,8 +120,49 @@ struct FactBubbleView: View {
                 .offset(x: shimmerOffset, y: -proxy.size.height * 0.35)
                 .blendMode(contrastStyle == .paper ? .softLight : .plusLighter)
         }
-        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .clipShape(bubbleShape)
         .allowsHitTesting(false)
+    }
+
+    private var sparkGlide: some View {
+        GeometryReader { proxy in
+            ZStack(alignment: .topLeading) {
+                Capsule(style: .continuous)
+                    .fill(accentColor.opacity(isPaper ? 0.42 : 0.72))
+                    .frame(width: 46, height: 2)
+                    .blur(radius: 0.6)
+                    .offset(x: sparkOffset, y: 1)
+
+                Circle()
+                    .fill(accentColor)
+                    .frame(width: 5, height: 5)
+                    .shadow(color: accentColor.opacity(0.85), radius: 7)
+                    .offset(x: sparkOffset + 44, y: -0.5)
+            }
+            .opacity(sparkOpacity)
+            .frame(width: proxy.size.width, height: proxy.size.height, alignment: .topLeading)
+        }
+        .clipShape(bubbleShape)
+        .allowsHitTesting(false)
+    }
+
+    private var notchLip: some View {
+        Capsule(style: .continuous)
+            .fill(
+                LinearGradient(
+                    colors: [
+                        accentColor.opacity(isPaper ? 0.42 : 0.76),
+                        Color.white.opacity(isPaper ? 0.36 : 0.28)
+                    ],
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+            )
+            .frame(width: notchLipWidth, height: 3)
+            .blur(radius: 0.35)
+            .opacity(notchLipOpacity)
+            .offset(y: -0.5)
+            .allowsHitTesting(false)
     }
 
     private var accentColor: Color {
@@ -178,6 +252,10 @@ struct FactBubbleView: View {
         )
     }
 
+    private var innerBorderColor: Color {
+        isPaper ? Color.white.opacity(0.52) : Color.white.opacity(0.1)
+    }
+
     private var shadowColor: Color {
         isPaper ? Color.black.opacity(0.22) : accentColor.opacity(0.24)
     }
@@ -187,21 +265,45 @@ struct FactBubbleView: View {
     }
 
     private func animateIn() {
-        withAnimation(.spring(response: 0.38, dampingFraction: 0.72)) {
-            isVisible = true
+        withAnimation(.spring(response: 0.56, dampingFraction: 0.9, blendDuration: 0.12).delay(0.1)) {
+            contentOpacity = 1
+            contentScale = 1
+            contentOffset = 0
             iconLift = 0
+            glowPulse = true
         }
 
-        withAnimation(.easeInOut(duration: 0.52).delay(0.12)) {
+        withAnimation(.easeOut(duration: 0.62).delay(0.2)) {
+            notchLipWidth = 26
+            notchLipOpacity = 0
+        }
+
+        withAnimation(.easeInOut(duration: 0.64).delay(0.18)) {
             iconLift = -1
         }
 
-        withAnimation(.easeInOut(duration: 0.52).delay(0.64)) {
+        withAnimation(.easeInOut(duration: 0.62).delay(0.78)) {
             iconLift = 0
         }
 
-        withAnimation(.linear(duration: 1.1).delay(0.16)) {
+        withAnimation(.easeOut(duration: 0.9).delay(0.2)) {
             shimmerOffset = 520
+        }
+
+        withAnimation(.easeIn(duration: 0.16).delay(0.24)) {
+            sparkOpacity = 1
+        }
+
+        withAnimation(.timingCurve(0.2, 0.82, 0.18, 1, duration: 1.05).delay(0.24)) {
+            sparkOffset = 430
+        }
+
+        withAnimation(.easeOut(duration: 0.32).delay(1.05)) {
+            sparkOpacity = 0
+        }
+
+        withAnimation(.easeOut(duration: 1.4).delay(0.7)) {
+            glowPulse = false
         }
     }
 }

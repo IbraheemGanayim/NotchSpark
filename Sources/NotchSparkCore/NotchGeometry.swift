@@ -76,8 +76,12 @@ public enum NotchGeometry {
             : min(max(frame.width * 0.17, 154), 216)
 
         let notchHeight = max(34, detectedShelfHeight, min(screen.safeAreaInsets.top, 82))
-        let triggerWidth = min(frame.width, max(notchWidth + 184, 312))
-        let triggerHeight = max(notchHeight + 90, 124)
+        let triggerWidth = hasDetectedNotch
+            ? min(frame.width, notchWidth)
+            : min(frame.width, max(142, min(notchWidth, 176)))
+        let triggerHeight = hasDetectedNotch
+            ? notchHeight
+            : 44
         let triggerX = clamp(centerX - (triggerWidth / 2), min: frame.minX, max: frame.maxX - triggerWidth)
         let triggerZone = CGRect(
             x: triggerX,
