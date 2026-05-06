@@ -8,6 +8,8 @@
     <string>NotchSpark</string>
     <key>CFBundleExecutable</key>
     <string>NotchSpark</string>
+    <key>CFBundleIconFile</key>
+    <string>NotchSpark</string>
     <key>CFBundleIdentifier</key>
     <string>com.ibraheemganayim.notchspark</string>
     <key>CFBundleInfoDictionaryVersion</key>
@@ -24,6 +26,8 @@
     <string>13.0</string>
     <key>LSUIElement</key>
     <true/>
+    <key>NSCameraUsageDescription</key>
+    <string>NotchSpark uses the camera only when Reaction Camera is enabled, showing a live local preview beside facts.</string>
     <key>NSHighResolutionCapable</key>
     <true/>
     <key>NSSupportsAutomaticGraphicsSwitching</key>

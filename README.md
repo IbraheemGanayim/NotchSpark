@@ -71,6 +71,7 @@ Running from source is useful for development. The app hides its Dock icon, but 
 From the menu-bar icon you can:
 
 - Toggle NotchSpark on or off.
+- Toggle Reaction Camera to show a live circular camera preview beside facts.
 - Show a fact immediately.
 - Enable Launch at Login.
 - Quit the app.
@@ -84,6 +85,7 @@ NotchSpark is intentionally quiet:
 - No tracking.
 - No Accessibility permission.
 - No Input Monitoring permission.
+- Optional Reaction Camera access only when you turn it on; it shows a local live preview while facts are visible and does not record or save anything.
 
 For adaptive contrast, NotchSpark uses macOS screen sampling only if access is already available. If it is not available, the app falls back to a high-contrast dark popup and keeps going.
 

@@ -14,6 +14,7 @@ rm -rf "$APP_PATH"
 mkdir -p "$MACOS_PATH" "$RESOURCES_PATH"
 cp "$ROOT_DIR/.build/release/NotchSpark" "$MACOS_PATH/NotchSpark"
 cp "$ROOT_DIR/Packaging/Info.plist" "$CONTENTS_PATH/Info.plist"
+cp "$ROOT_DIR/Packaging/NotchSpark.icns" "$RESOURCES_PATH/NotchSpark.icns"
 chmod +x "$MACOS_PATH/NotchSpark"
 
 if command -v codesign >/dev/null 2>&1; then

@@ -1,12 +1,15 @@
 import NotchSparkCore
+import AVFoundation
 import SwiftUI
 
 struct FactBubbleView: View {
     let fact: FunFact
     let contrastStyle: BubbleContrastStyle
+    let reactionCameraSession: AVCaptureSession?
 
     private let bubbleRadius: CGFloat = 22
     private let iconSize: CGFloat = 32
+    private let reactionCameraSize: CGFloat = 42
 
     @State private var contentOpacity = 0.0
     @State private var contentScale: CGFloat = 0.94
@@ -56,6 +59,10 @@ struct FactBubbleView: View {
                 .fixedSize(horizontal: false, vertical: true)
 
             Spacer(minLength: 0)
+
+            if let reactionCameraSession {
+                reactionCamera(session: reactionCameraSession)
+            }
         }
     }
 
@@ -75,6 +82,18 @@ struct FactBubbleView: View {
                 .offset(y: iconLift)
         }
         .frame(width: iconSize, height: iconSize)
+    }
+
+    private func reactionCamera(session: AVCaptureSession) -> some View {
+        ReactionCameraPreview(session: session)
+            .frame(width: reactionCameraSize, height: reactionCameraSize)
+            .clipShape(Circle())
+            .overlay(
+                Circle()
+                    .strokeBorder(cameraBorderColor, lineWidth: 1.2)
+            )
+            .shadow(color: cameraShadowColor, radius: 10, y: 3)
+            .accessibilityLabel("Reaction camera preview")
     }
 
     private var bubbleBackground: some View {
@@ -208,6 +227,14 @@ struct FactBubbleView: View {
 
     private var iconShadow: Color {
         isPaper ? Color.white.opacity(0.35) : accentColor.opacity(0.58)
+    }
+
+    private var cameraBorderColor: Color {
+        isPaper ? Color.black.opacity(0.2) : Color.white.opacity(0.26)
+    }
+
+    private var cameraShadowColor: Color {
+        isPaper ? Color.black.opacity(0.18) : Color.black.opacity(0.32)
     }
 
     private var surfaceGradient: LinearGradient {

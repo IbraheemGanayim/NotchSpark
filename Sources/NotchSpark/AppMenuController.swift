@@ -4,19 +4,26 @@ import ServiceManagement
 final class AppMenuController: NSObject {
     private let statusItem: NSStatusItem
     private let onToggleEnabled: (Bool) -> Void
+    private let onToggleReactionCamera: (Bool) -> Void
     private let onShowFactNow: () -> Void
 
     private var isEnabled: Bool
+    private var isReactionCameraEnabled: Bool
     private var enabledItem = NSMenuItem()
+    private var reactionCameraItem = NSMenuItem()
     private var launchAtLoginItem = NSMenuItem()
 
     init(
         isEnabled: Bool,
+        isReactionCameraEnabled: Bool,
         onToggleEnabled: @escaping (Bool) -> Void,
+        onToggleReactionCamera: @escaping (Bool) -> Void,
         onShowFactNow: @escaping () -> Void
     ) {
         self.isEnabled = isEnabled
+        self.isReactionCameraEnabled = isReactionCameraEnabled
         self.onToggleEnabled = onToggleEnabled
+        self.onToggleReactionCamera = onToggleReactionCamera
         self.onShowFactNow = onShowFactNow
         self.statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         super.init()
@@ -50,6 +57,10 @@ final class AppMenuController: NSObject {
         enabledItem.target = self
         menu.addItem(enabledItem)
 
+        reactionCameraItem = NSMenuItem(title: "Reaction Camera", action: #selector(toggleReactionCamera), keyEquivalent: "")
+        reactionCameraItem.target = self
+        menu.addItem(reactionCameraItem)
+
         launchAtLoginItem = NSMenuItem(title: "Launch at Login", action: #selector(toggleLaunchAtLogin), keyEquivalent: "")
         launchAtLoginItem.target = self
         menu.addItem(launchAtLoginItem)
@@ -66,6 +77,7 @@ final class AppMenuController: NSObject {
 
     private func refreshMenuState() {
         enabledItem.state = isEnabled ? .on : .off
+        reactionCameraItem.state = isReactionCameraEnabled ? .on : .off
 
         guard isRunningFromAppBundle else {
             launchAtLoginItem.title = "Launch at Login (bundle required)"
@@ -91,6 +103,11 @@ final class AppMenuController: NSObject {
         Bundle.main.bundleURL.pathExtension == "app"
     }
 
+    func setReactionCameraEnabled(_ isEnabled: Bool) {
+        isReactionCameraEnabled = isEnabled
+        refreshMenuState()
+    }
+
     @objc private func showFactNow() {
         onShowFactNow()
     }
@@ -99,6 +116,16 @@ final class AppMenuController: NSObject {
         isEnabled.toggle()
         onToggleEnabled(isEnabled)
         refreshMenuState()
+    }
+
+    @objc private func toggleReactionCamera() {
+        let requestedState = !isReactionCameraEnabled
+        onToggleReactionCamera(requestedState)
+
+        if !requestedState {
+            isReactionCameraEnabled = false
+            refreshMenuState()
+        }
     }
 
     @objc private func toggleLaunchAtLogin() {

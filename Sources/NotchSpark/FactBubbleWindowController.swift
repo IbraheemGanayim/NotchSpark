@@ -3,12 +3,18 @@ import NotchSparkCore
 import SwiftUI
 
 final class FactBubbleWindowController {
+    private let reactionCameraManager: ReactionCameraManager
     private var panel: NSPanel?
     private var dismissWorkItem: DispatchWorkItem?
     private var currentMorphFrame: CGRect?
 
-    func show(fact: FunFact, metrics: NotchMetrics) {
-        let frame = bubbleFrame(for: metrics)
+    init(reactionCameraManager: ReactionCameraManager) {
+        self.reactionCameraManager = reactionCameraManager
+    }
+
+    func show(fact: FunFact, metrics: NotchMetrics, showsReactionCamera: Bool) {
+        let shouldShowReactionCamera = showsReactionCamera && reactionCameraManager.canShowPreview
+        let frame = bubbleFrame(for: metrics, showsReactionCamera: shouldShowReactionCamera)
         let morphFrame = notchMorphFrame(for: metrics, finalFrame: frame)
         let contrastStyle = BackdropContrastSampler.style(behind: frame)
         let panel = panel ?? makePanel(frame: frame)
@@ -17,8 +23,19 @@ final class FactBubbleWindowController {
 
         dismissWorkItem?.cancel()
 
+        if shouldShowReactionCamera {
+            reactionCameraManager.startSessionIfNeeded()
+        } else {
+            reactionCameraManager.stopSession()
+        }
+
         let hostingView = NSHostingView(
-            rootView: FactBubbleView(fact: fact, contrastStyle: contrastStyle).id(UUID())
+            rootView: FactBubbleView(
+                fact: fact,
+                contrastStyle: contrastStyle,
+                reactionCameraSession: shouldShowReactionCamera ? reactionCameraManager.session : nil
+            )
+            .id(UUID())
         )
         hostingView.wantsLayer = true
         hostingView.layer?.backgroundColor = NSColor.clear.cgColor
@@ -66,6 +83,7 @@ final class FactBubbleWindowController {
             } completionHandler: {
                 panel.orderOut(nil)
                 self.currentMorphFrame = nil
+                self.reactionCameraManager.stopSession()
             }
         }
     }
@@ -94,8 +112,11 @@ final class FactBubbleWindowController {
         return panel
     }
 
-    private func bubbleFrame(for metrics: NotchMetrics) -> CGRect {
-        let width = min(392, max(292, metrics.screenFrame.width - 52))
+    private func bubbleFrame(for metrics: NotchMetrics, showsReactionCamera: Bool) -> CGRect {
+        let availableWidth = max(220, metrics.screenFrame.width - 36)
+        let preferredWidth: CGFloat = showsReactionCamera ? 468 : 392
+        let minimumWidth: CGFloat = showsReactionCamera ? 352 : 292
+        let width = min(min(preferredWidth, max(minimumWidth, availableWidth)), availableWidth)
         let height: CGFloat = 66
         let x = clamp(
             metrics.bubbleAnchor.x - (width / 2),
